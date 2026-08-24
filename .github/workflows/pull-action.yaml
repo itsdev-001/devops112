@@ -1,0 +1,12 @@
+name: Event filters and Acitivity Types
+
+on:
+  pull_request:
+    types: [opened , closed , reopened]
+    branches:
+      - main
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This workflow runs when a pull request is opened, closed, or reopened on the main branch."
