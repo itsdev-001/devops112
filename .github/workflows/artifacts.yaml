@@ -1,0 +1,91 @@
+16. GITHUB ACTIONS ARTIFACT WORKFLOW
+
+Create a GitHub Actions workflow named "Working with Artifacts".
+
+The workflow should use:
+
+on:
+  workflow_dispatch:
+
+Set the environment variable:
+
+build-artifact-key: app-${{ github.sha }}
+
+Create two jobs:
+
+JOB 1 — test-build
+
+- Runner: ubuntu-latest
+- Working directory: react-app
+
+Steps:
+
+1. Checkout code
+   uses: actions/checkout@v7
+
+2. Setup Node
+   uses: actions/setup-node@v7
+   node-version: '24.x'
+
+3. Download cached dependencies
+   uses: actions/cache@v6
+
+   Cache path:
+   react-app/node_modules
+
+   Cache key:
+   deps-node-modules-${{ hashFiles('react-app/package-lock.json') }}
+
+4. Install dependencies
+   Run:
+   npm ci
+
+   Only run when the cache was not found.
+
+5. Unit tests
+   Run:
+   npm run test
+
+6. Build code
+   Run:
+   npm run build
+
+7. Upload build files
+   uses: actions/upload-artifact@v7
+
+   Artifact name:
+   ${{ env.build-artifact-key }}
+
+   Artifact path:
+   react-app/build
+
+
+JOB 2 — deploy
+
+- Runner: ubuntu-latest
+- This job must depend on test-build.
+
+needs:
+  test-build
+
+Steps:
+
+1. Download build artifact
+   uses: actions/download-artifact@v8
+
+   Artifact name:
+   ${{ env.build-artifact-key }}
+
+   Download path:
+   build
+
+2. Show folder structure
+
+Run:
+ls -R
+
+
+IMPORTANT:
+Preserve the same workflow structure, job names, artifact naming convention,
+Node version, cache configuration, build process, artifact upload/download
+process, and job dependency shown above.
